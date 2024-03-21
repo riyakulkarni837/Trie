@@ -14,8 +14,11 @@ class Trie:
         """Constructs a trie from the given list of words."""
         for key in text:
             node = self.root
-            for char in key:
+            i = 0
+            while i < len(key):
+                char = key[i]
                 node = node.children.setdefault(char, TrieNode(char))
+                i += 1
             node.is_end_word = True
 
         if self.is_compressed:
@@ -24,12 +27,17 @@ class Trie:
     def construct_suffix_tree_from_text(self, keys):
         """Constructs a suffix tree from the given list of words."""
         for key in keys:
-            for i in range(len(key)):
+            i = 0
+            while i < len(key):
                 node = self.root
                 suffix = key[i:]
-                for char in suffix:
+                j = 0
+                while j < len(suffix):
+                    char = suffix[j]
                     node = node.children.setdefault(char, TrieNode(char))
+                    j += 1
                 node.is_end_word = True
+                i += 1
             
         if self.is_compressed:
             self.compress(self.root)
@@ -54,18 +62,30 @@ class Trie:
         node = self.root
         if self.is_compressed:
             common_prefix = ''
-            for char in suffix:
+            i = 0
+            while i < len(suffix):
+                char = suffix[i]
                 if char in node.children:
                     common_prefix += char
                     node = node.children[char]
                 else:
                     break
-            for char in suffix[len(common_prefix):]:
-                node = node.children.setdefault(char, TrieNode())
+                i += 1
+            while i < len(suffix):
+                char = suffix[i]
+                if char not in node.children:
+                    node.children[char] = TrieNode()
+                node = node.children[char]
+                i += 1
             node.is_end_word = True
         else:
-            for char in suffix:
-                node = node.children.setdefault(char, TrieNode(char))
+            i = 0
+            while i < len(suffix):
+                char = suffix[i]
+                if char not in node.children:
+                    node.children[char] = TrieNode(char)
+                node = node.children[char]
+                i += 1
             node.is_end_word = True
 
     def search_and_get_depth(self, key):
